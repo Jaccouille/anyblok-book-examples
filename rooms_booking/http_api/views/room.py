@@ -8,6 +8,28 @@
 from cornice.resource import resource
 from anyblok_pyramid_rest_api.crud_resource import CrudResource
 from anyblok_pyramid import current_blok
+from anyblok_marshmallow import SchemaWrapper
+from marshmallow import Schema
+from anyblok_marshmallow import fields
+
+
+class RoomNameSchema(Schema):
+    id = fields.Integer()
+    name = fields.String()
+
+
+class AddressSchema(SchemaWrapper):
+    model = "Model.Address"
+
+    class Schema:
+        rooms = fields.List(fields.Nested(RoomNameSchema))
+
+
+class RoomsSchema(SchemaWrapper):
+    model = "Model.Room"
+
+    class Schema:
+        address = fields.Nested(AddressSchema)
 
 
 @resource(
@@ -17,3 +39,4 @@ from anyblok_pyramid import current_blok
 )
 class RoomsResource(CrudResource):
     model = "Model.Room"
+    default_schema = RoomsSchema
